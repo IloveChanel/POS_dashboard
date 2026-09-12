@@ -1,0 +1,166 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Buscemi's — Export &amp; Accounting</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Fredoka:wght@500;600;700&family=Nunito+Sans:wght@400;600;700;800&family=Yellowtail&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --red:#C8102E; --red-deep:#970B22;
+    --cream:#FFF8EC; --wood:#5C3A22; --wood-dark:#432A18;
+    --gold:#F4B942; --ink:#2B1B10; --gray:#8A7460; --line: rgba(43,27,16,0.14);
+  }
+  *{box-sizing:border-box;}
+  body{margin:0;background:#F6F1E9;color:var(--ink);font-family:'Nunito Sans',sans-serif;}
+  h1,h2,h3{font-family:'Fredoka',sans-serif;font-weight:700;margin:0;}
+  button{font-family:inherit;cursor:pointer;border:none;}
+  .dash-wrap{max-width:1100px;margin:0 auto;padding:0 24px;}
+
+  header.dash-header{background:var(--ink);color:var(--cream);padding:16px 0;}
+  .dash-top{display:flex;justify-content:space-between;align-items:center;}
+  .store-id{font-family:'Fredoka',sans-serif;font-weight:700;font-size:19px;}
+  .admin-nav{background:var(--wood-dark);}
+  .admin-nav .dash-wrap{display:flex;gap:4px;}
+  .admin-nav a{color:rgba(255,248,236,0.65);font-size:13.5px;font-weight:700;padding:14px 18px;display:inline-block;border-bottom:3px solid transparent;text-decoration:none;}
+  .admin-nav a.active{color:var(--cream);border-bottom-color:var(--gold);}
+  .admin-nav a:hover{color:var(--cream);}
+
+  .page-body{padding:28px 24px 60px;}
+  .panel{background:#fff;border:1px solid var(--line);border-radius:14px;padding:26px 28px;margin-bottom:24px;}
+  .panel h2{font-size:20px;margin-bottom:4px;}
+  .panel .sub{font-size:13.5px;color:var(--gray);margin-bottom:20px;}
+
+  .filter-row{display:flex;gap:14px;flex-wrap:wrap;align-items:flex-end;margin-bottom:20px;}
+  .field label{display:block;font-size:12.5px;font-weight:700;margin-bottom:6px;}
+  .field input,.field select{padding:10px 12px;border:2px solid var(--line);border-radius:8px;font-size:14px;font-family:inherit;}
+
+  .summary-strip{display:flex;gap:16px;flex-wrap:wrap;margin-bottom:22px;}
+  .stat{background:#F6F1E9;border-radius:10px;padding:14px 20px;min-width:140px;}
+  .stat .num{font-family:'Fredoka',sans-serif;font-weight:700;font-size:22px;color:var(--red);}
+  .stat .lbl{font-size:12px;color:var(--gray);font-weight:700;}
+
+  table.orders-table{width:100%;border-collapse:collapse;font-size:13.5px;}
+  table.orders-table th{text-align:left;padding:10px 12px;background:#F6F1E9;font-weight:800;color:var(--gray);font-size:12px;text-transform:uppercase;letter-spacing:0.03em;}
+  table.orders-table td{padding:10px 12px;border-bottom:1px solid var(--line);}
+
+  .export-btn{
+    background:var(--red);color:#fff;font-weight:800;font-size:15px;padding:13px 26px;border-radius:8px;
+    box-shadow:0 4px 0 var(--red-deep);
+  }
+  .export-btn:hover{background:var(--red-deep);}
+  .export-btn.secondary{background:var(--ink);box-shadow:0 4px 0 #000;}
+  .export-btn.secondary:hover{background:#3d2716;}
+  .btn-row{display:flex;gap:12px;flex-wrap:wrap;}
+</style>
+</head>
+<body>
+
+<header class="dash-header">
+  <div class="dash-wrap dash-top">
+    <div class="store-id">Harrison Township<small style="display:block;font-size:12px;font-weight:600;color:rgba(255,248,236,0.6);">Store ID: HARRISON-001</small></div>
+    <div style="font-size:13px;">Export &amp; Accounting</div>
+  </div>
+</header>
+<nav class="admin-nav">
+  <div class="dash-wrap">
+    <a href="dashboard.html">Orders</a>
+    <a href="menu-items.html">Menu Items</a>
+    <a href="export.html" class="active">Export / Accounting</a>
+  </div>
+</nav>
+
+<div class="page-body dash-wrap">
+
+  <div class="panel">
+    <h2>Export Orders</h2>
+    <div class="sub">Pick a date range, then download for your bookkeeper or accounting software.</div>
+
+    <div class="filter-row">
+      <div class="field"><label>From</label><input type="date" id="date-from" value="2026-09-01"></div>
+      <div class="field"><label>To</label><input type="date" id="date-to" value="2026-09-11"></div>
+      <div class="field"><label>Fulfillment</label>
+        <select id="filter-fulfill"><option value="all">All</option><option value="pickup">Pickup only</option><option value="delivery">Delivery only</option></select>
+      </div>
+    </div>
+
+    <div class="summary-strip">
+      <div class="stat"><div class="num" id="stat-count">6</div><div class="lbl">Orders in range</div></div>
+      <div class="stat"><div class="num" id="stat-total">$247.85</div><div class="lbl">Total revenue</div></div>
+      <div class="stat"><div class="num" id="stat-avg">$41.31</div><div class="lbl">Average order</div></div>
+    </div>
+
+    <table class="orders-table" id="orders-table">
+      <thead><tr><th>Order #</th><th>Date</th><th>Customer</th><th>Fulfillment</th><th>Total</th><th>Status</th></tr></thead>
+      <tbody id="orders-table-body"></tbody>
+    </table>
+
+    <div class="btn-row" style="margin-top:22px;">
+      <button class="export-btn" onclick="exportCSV()">Download CSV</button>
+      <button class="export-btn secondary" onclick="alert('This would generate a formatted PDF summary for your records.')">Download PDF Summary</button>
+    </div>
+  </div>
+
+</div>
+
+<script>
+const orders = [
+  {id:'1042', date:'2026-09-11', customer:'Michelle Vance', fulfill:'pickup', total:58.97, status:'open'},
+  {id:'1043', date:'2026-09-11', customer:'James Kowalski', fulfill:'delivery', total:26.98, status:'printed'},
+  {id:'1044', date:'2026-09-11', customer:'Angela Reyes', fulfill:'pickup', total:35.97, status:'fulfilled'},
+  {id:'1045', date:'2026-09-10', customer:'Tom Bishara', fulfill:'delivery', total:74.97, status:'open'},
+  {id:'1046', date:'2026-09-10', customer:'Priya Nair', fulfill:'pickup', total:20.98, status:'fulfilled'},
+  {id:'1047', date:'2026-09-09', customer:'Dave Okafor', fulfill:'pickup', total:29.98, status:'printed'}
+];
+
+function getFiltered(){
+  const from = document.getElementById('date-from').value;
+  const to = document.getElementById('date-to').value;
+  const fulfill = document.getElementById('filter-fulfill').value;
+  return orders.filter(o =>
+    o.date >= from && o.date <= to &&
+    (fulfill === 'all' || o.fulfill === fulfill)
+  );
+}
+
+function render(){
+  const filtered = getFiltered();
+  const body = document.getElementById('orders-table-body');
+  body.innerHTML = filtered.map(o => `
+    <tr>
+      <td>#${o.id}</td><td>${o.date}</td><td>${o.customer}</td>
+      <td style="text-transform:capitalize;">${o.fulfill}</td>
+      <td>$${o.total.toFixed(2)}</td><td style="text-transform:capitalize;">${o.status}</td>
+    </tr>
+  `).join('');
+
+  const total = filtered.reduce((sum,o)=>sum+o.total,0);
+  document.getElementById('stat-count').textContent = filtered.length;
+  document.getElementById('stat-total').textContent = '$' + total.toFixed(2);
+  document.getElementById('stat-avg').textContent = '$' + (filtered.length ? (total/filtered.length).toFixed(2) : '0.00');
+}
+
+function exportCSV(){
+  const filtered = getFiltered();
+  let csv = 'Order Number,Date,Customer,Fulfillment,Total,Status\n';
+  filtered.forEach(o => {
+    csv += `${o.id},${o.date},"${o.customer}",${o.fulfill},${o.total.toFixed(2)},${o.status}\n`;
+  });
+  const blob = new Blob([csv], {type:'text/csv'});
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  a.href = url;
+  a.download = 'buscemis-harrison-township-orders.csv';
+  a.click();
+  URL.revokeObjectURL(url);
+}
+
+document.getElementById('date-from').addEventListener('change', render);
+document.getElementById('date-to').addEventListener('change', render);
+document.getElementById('filter-fulfill').addEventListener('change', render);
+render();
+</script>
+
+</body>
+</html>

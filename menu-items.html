@@ -1,0 +1,264 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Buscemi's — Menu Items</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Fredoka:wght@500;600;700&family=Nunito+Sans:wght@400;600;700;800&family=Yellowtail&display=swap" rel="stylesheet">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/PapaParse/5.4.1/papaparse.min.js"></script>
+<style>
+  :root{
+    --red:#C8102E; --red-deep:#970B22;
+    --cream:#FFF8EC; --wood:#5C3A22; --wood-dark:#432A18;
+    --gold:#F4B942; --ink:#2B1B10;
+    --green:#3B7A3B; --green-bg:#E7F3E7;
+    --gray:#8A7460; --line: rgba(43,27,16,0.14);
+  }
+  *{box-sizing:border-box;}
+  body{margin:0;background:#F6F1E9;color:var(--ink);font-family:'Nunito Sans',sans-serif;}
+  h1,h2,h3{font-family:'Fredoka',sans-serif;font-weight:700;margin:0;}
+  button{font-family:inherit;cursor:pointer;border:none;}
+  .dash-wrap{max-width:1100px;margin:0 auto;padding:0 24px;}
+
+  header.dash-header{background:var(--ink);color:var(--cream);padding:16px 0;}
+  .dash-top{display:flex;justify-content:space-between;align-items:center;}
+  .store-id{font-family:'Fredoka',sans-serif;font-weight:700;font-size:19px;}
+  .admin-nav{background:var(--wood-dark);}
+  .admin-nav .dash-wrap{display:flex;gap:4px;}
+  .admin-nav a{color:rgba(255,248,236,0.65);font-size:13.5px;font-weight:700;padding:14px 18px;display:inline-block;border-bottom:3px solid transparent;text-decoration:none;}
+  .admin-nav a.active{color:var(--cream);border-bottom-color:var(--gold);}
+  .admin-nav a:hover{color:var(--cream);}
+
+  .page-body{padding:28px 24px 60px;}
+  .panel{background:#fff;border:1px solid var(--line);border-radius:14px;padding:26px 28px;margin-bottom:24px;}
+  .panel h2{font-size:20px;margin-bottom:4px;}
+  .panel .sub{font-size:13.5px;color:var(--gray);margin-bottom:20px;}
+
+  /* item list */
+  .item-row{
+    display:flex;align-items:center;gap:16px;padding:14px 0;border-bottom:1px solid var(--line);
+  }
+  .item-row:last-child{border-bottom:none;}
+  .item-thumb{width:56px;height:56px;border-radius:8px;background:var(--gold);flex-shrink:0;
+    display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:800;color:#7a5a10;text-align:center;overflow:hidden;}
+  .item-thumb img{width:100%;height:100%;object-fit:cover;}
+  .item-info{flex:1;min-width:150px;}
+  .item-name{font-weight:700;font-size:15px;}
+  .item-cat{font-size:12px;color:var(--gray);}
+  .item-price{font-family:'Fredoka',sans-serif;font-weight:700;color:var(--red);font-size:15px;min-width:70px;text-align:right;}
+  .item-actions{display:flex;gap:8px;}
+  .action-btn{font-size:12.5px;font-weight:700;padding:7px 14px;border-radius:7px;}
+  .action-btn.edit{background:var(--ink);color:var(--cream);}
+  .action-btn.delete{background:transparent;border:1.5px solid var(--red)!important;color:var(--red);}
+  .action-btn.delete:hover{background:#FCEBEB;}
+
+  /* add item form */
+  .form-grid{display:grid;grid-template-columns:1fr 1fr;gap:16px;}
+  .field{margin-bottom:2px;}
+  .field label{display:block;font-size:13px;font-weight:700;margin-bottom:6px;}
+  .field input,.field select,.field textarea{
+    width:100%;padding:11px 13px;border:2px solid var(--line);border-radius:8px;font-size:14.5px;
+    background:#fff;color:var(--ink);font-family:inherit;
+  }
+  .field input:focus,.field select:focus,.field textarea:focus{outline:none;border-color:var(--red);}
+  .field.full{grid-column:1/-1;}
+  .photo-drop{
+    border:2px dashed var(--line);border-radius:10px;padding:22px;text-align:center;font-size:13.5px;color:var(--gray);
+    cursor:pointer;
+  }
+  .photo-drop:hover{border-color:var(--red);color:var(--red);}
+  .submit-btn{
+    background:var(--red);color:#fff;font-weight:800;font-size:15px;padding:13px 26px;border-radius:8px;
+    margin-top:6px;box-shadow:0 4px 0 var(--red-deep);
+  }
+  .submit-btn:hover{background:var(--red-deep);}
+
+  /* bulk add */
+  .bulk-drop{
+    border:2px dashed var(--line);border-radius:10px;padding:30px;text-align:center;
+  }
+  .bulk-drop input[type=file]{margin-top:10px;}
+  .bulk-hint{font-size:12.5px;color:var(--gray);margin-top:8px;}
+  .bulk-preview{margin-top:18px;width:100%;border-collapse:collapse;font-size:13px;}
+  .bulk-preview th{text-align:left;padding:8px 10px;background:#F6F1E9;font-weight:800;color:var(--gray);}
+  .bulk-preview td{padding:8px 10px;border-bottom:1px solid var(--line);}
+  .bulk-confirm-btn{
+    background:var(--green);color:#fff;font-weight:800;font-size:14px;padding:11px 22px;border-radius:8px;margin-top:14px;
+  }
+  .toast{
+    position:fixed;bottom:24px;right:24px;background:var(--ink);color:var(--cream);padding:14px 22px;
+    border-radius:10px;font-size:14px;font-weight:700;display:none;box-shadow:0 10px 30px rgba(0,0,0,0.3);
+  }
+</style>
+</head>
+<body>
+
+<header class="dash-header">
+  <div class="dash-wrap dash-top">
+    <div class="store-id">Harrison Township<small style="display:block;font-size:12px;font-weight:600;color:rgba(255,248,236,0.6);">Store ID: HARRISON-001</small></div>
+    <div style="font-size:13px;">Menu Item Management</div>
+  </div>
+</header>
+<nav class="admin-nav">
+  <div class="dash-wrap">
+    <a href="dashboard.html">Orders</a>
+    <a href="menu-items.html" class="active">Menu Items</a>
+    <a href="export.html">Export / Accounting</a>
+  </div>
+</nav>
+
+<div class="page-body dash-wrap">
+
+  <div class="panel">
+    <h2>Current Menu</h2>
+    <div class="sub">Click Delete to remove an item, or Edit to update price, photo, or details.</div>
+    <div id="item-list"></div>
+  </div>
+
+  <div class="panel">
+    <h2>Add a New Item</h2>
+    <div class="sub">One at a time — photo, price, category, and description.</div>
+    <div class="form-grid">
+      <div class="field"><label>Item Name</label><input id="new-name" placeholder="e.g. Detroit Style Pizza"></div>
+      <div class="field"><label>Price</label><input id="new-price" placeholder="e.g. 24.99"></div>
+      <div class="field"><label>Category</label>
+        <select id="new-cat">
+          <option>Pizza</option><option>Subs</option><option>Sides</option><option>Trays</option><option>Beverages</option>
+        </select>
+      </div>
+      <div class="field"><label>Available For</label>
+        <select id="new-avail"><option>Pickup &amp; Delivery</option><option>Pickup Only</option><option>Delivery Only</option></select>
+      </div>
+      <div class="field full"><label>Description</label><textarea id="new-desc" rows="2" placeholder="Short description customers will see"></textarea></div>
+      <div class="field full">
+        <label>Photo</label>
+        <div class="photo-drop" onclick="document.getElementById('new-photo').click()">
+          Click to upload a photo (JPG or PNG)
+          <input type="file" id="new-photo" accept="image/*" style="display:none">
+        </div>
+      </div>
+    </div>
+    <button class="submit-btn" onclick="addItem()">Add Item</button>
+  </div>
+
+  <div class="panel">
+    <h2>Bulk Add Items</h2>
+    <div class="sub">Upload a spreadsheet with columns: name, price, category, description, image_url — every row becomes a menu item.</div>
+    <div class="bulk-drop">
+      <div>Drop a CSV here, or</div>
+      <input type="file" id="bulk-file" accept=".csv" onchange="handleBulkFile(event)">
+      <div class="bulk-hint">Don't have photos linked yet? Leave image_url blank — you can add them per item afterward.</div>
+    </div>
+    <table class="bulk-preview" id="bulk-preview" style="display:none;">
+      <thead><tr><th>Name</th><th>Price</th><th>Category</th><th>Description</th></tr></thead>
+      <tbody id="bulk-preview-body"></tbody>
+    </table>
+    <button class="bulk-confirm-btn" id="bulk-confirm-btn" style="display:none;" onclick="confirmBulkAdd()">Add All Items to Menu</button>
+  </div>
+
+</div>
+
+<div class="toast" id="toast"></div>
+
+<script>
+let items = [
+  {name:'Detroit Style Pizza', price:'24.99', cat:'Pizza', img:null},
+  {name:'The Torpedo 12"', price:'11.99', cat:'Subs', img:null},
+  {name:'Chicken Tenders 5pc', price:'8.99', cat:'Sides', img:null},
+  {name:'Square Cheese Tray 6pc', price:'14.99', cat:'Trays', img:null},
+  {name:'Mozzarella Sticks', price:'5.49', cat:'Sides', img:null},
+  {name:'Chicken Wings 5pc', price:'8.99', cat:'Sides', img:null}
+];
+let bulkPending = [];
+
+function renderItems(){
+  const list = document.getElementById('item-list');
+  list.innerHTML = items.map((it, i) => `
+    <div class="item-row">
+      <div class="item-thumb">${it.img ? `<img src="${it.img}">` : 'PHOTO'}</div>
+      <div class="item-info">
+        <div class="item-name">${it.name}</div>
+        <div class="item-cat">${it.cat}</div>
+      </div>
+      <div class="item-price">$${it.price}</div>
+      <div class="item-actions">
+        <button class="action-btn edit" onclick="alert('Edit form would open here for: ${it.name}')">Edit</button>
+        <button class="action-btn delete" onclick="deleteItem(${i})">Delete</button>
+      </div>
+    </div>
+  `).join('');
+}
+
+function deleteItem(i){
+  if(confirm('Remove "' + items[i].name + '" from the menu?')){
+    items.splice(i,1);
+    renderItems();
+    showToast('Item removed');
+  }
+}
+
+function addItem(){
+  const name = document.getElementById('new-name').value.trim();
+  const price = document.getElementById('new-price').value.trim();
+  const cat = document.getElementById('new-cat').value;
+  if(!name || !price){
+    alert('Enter at least a name and price.');
+    return;
+  }
+  let img = null;
+  const fileInput = document.getElementById('new-photo');
+  if(fileInput.files && fileInput.files[0]){
+    img = URL.createObjectURL(fileInput.files[0]);
+  }
+  items.push({name, price, cat, img});
+  renderItems();
+  document.getElementById('new-name').value='';
+  document.getElementById('new-price').value='';
+  document.getElementById('new-desc').value='';
+  fileInput.value='';
+  showToast('"' + name + '" added to menu');
+}
+
+function handleBulkFile(e){
+  const file = e.target.files[0];
+  if(!file) return;
+  Papa.parse(file, {
+    header:true,
+    skipEmptyLines:true,
+    complete: function(results){
+      bulkPending = results.data;
+      const body = document.getElementById('bulk-preview-body');
+      body.innerHTML = bulkPending.map(r => `
+        <tr><td>${r.name||''}</td><td>$${r.price||''}</td><td>${r.category||''}</td><td>${r.description||''}</td></tr>
+      `).join('');
+      document.getElementById('bulk-preview').style.display = bulkPending.length ? 'table' : 'none';
+      document.getElementById('bulk-confirm-btn').style.display = bulkPending.length ? 'inline-block' : 'none';
+    }
+  });
+}
+
+function confirmBulkAdd(){
+  bulkPending.forEach(r => {
+    if(r.name) items.push({name:r.name, price:r.price||'0.00', cat:r.category||'Uncategorized', img:r.image_url||null});
+  });
+  renderItems();
+  document.getElementById('bulk-preview').style.display='none';
+  document.getElementById('bulk-confirm-btn').style.display='none';
+  document.getElementById('bulk-file').value='';
+  showToast(bulkPending.length + ' items added from spreadsheet');
+  bulkPending = [];
+}
+
+function showToast(msg){
+  const t = document.getElementById('toast');
+  t.textContent = msg;
+  t.style.display = 'block';
+  setTimeout(()=>{ t.style.display='none'; }, 2500);
+}
+
+renderItems();
+</script>
+
+</body>
+</html>

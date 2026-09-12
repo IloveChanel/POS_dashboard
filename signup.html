@@ -1,0 +1,135 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Buscemi's — Store Sign Up</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Fredoka:wght@500;600;700&family=Nunito+Sans:wght@400;600;700;800&family=Yellowtail&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --red:#C8102E; --red-deep:#970B22;
+    --cream:#FFF8EC; --wood:#5C3A22; --wood-dark:#432A18;
+    --gold:#F4B942; --ink:#2B1B10; --gray:#8A7460;
+    --green:#3B7A3B; --green-bg:#E7F3E7; --line: rgba(43,27,16,0.14);
+  }
+  *{box-sizing:border-box;}
+  body{margin:0;min-height:100vh;background:linear-gradient(135deg,var(--wood) 0%,var(--wood-dark) 100%);
+    font-family:'Nunito Sans',sans-serif;color:var(--ink);display:flex;align-items:center;justify-content:center;padding:30px;}
+  h1,h2,h3{font-family:'Fredoka',sans-serif;font-weight:700;margin:0;}
+  button{font-family:inherit;cursor:pointer;border:none;}
+
+  .card{background:var(--cream);border-radius:16px;padding:40px;width:100%;max-width:480px;box-shadow:0 20px 50px rgba(0,0,0,0.35);}
+  .logo{font-family:'Yellowtail',cursive;font-size:34px;color:var(--red);text-align:center;}
+  .sub{text-align:center;font-size:12px;font-weight:800;letter-spacing:0.1em;color:var(--gray);margin-bottom:26px;}
+
+  .field{margin-bottom:14px;}
+  .field label{display:block;font-size:13px;font-weight:700;margin-bottom:5px;}
+  .field input{width:100%;padding:11px 13px;border:2px solid var(--line);border-radius:8px;font-size:14.5px;background:#fff;color:var(--ink);}
+  .field input:focus{outline:none;border-color:var(--red);}
+  .row-2{display:grid;grid-template-columns:1fr 1fr;gap:12px;}
+  .err{font-size:12.5px;color:var(--red);margin-top:4px;display:none;}
+
+  .signup-btn{width:100%;background:var(--red);color:#fff;font-weight:800;font-size:16px;padding:14px;border-radius:8px;margin-top:8px;box-shadow:0 4px 0 var(--red-deep);}
+  .signup-btn:hover{background:var(--red-deep);}
+  .login-link{text-align:center;font-size:13px;color:var(--gray);margin-top:18px;}
+  .login-link a{color:var(--red);font-weight:700;text-decoration:none;}
+
+  /* success screen */
+  #success-screen{display:none;text-align:center;}
+  .store-id-display{
+    background:var(--wood-dark);color:var(--gold);font-family:'Fredoka',sans-serif;font-weight:700;
+    font-size:26px;padding:18px;border-radius:10px;margin:20px 0;letter-spacing:0.03em;
+  }
+  .success-note{font-size:13.5px;color:var(--gray);margin-bottom:6px;}
+  .go-btn{background:var(--green);color:#fff;font-weight:800;font-size:15px;padding:13px 26px;border-radius:8px;margin-top:14px;}
+  .go-btn:hover{background:#2f632f;}
+</style>
+</head>
+<body>
+
+<div class="card">
+
+  <div id="form-screen">
+    <div class="logo">Buscemi's</div>
+    <div class="sub">CREATE YOUR STORE ACCOUNT</div>
+
+    <div class="field"><label>Store Location Name</label><input id="f-location" placeholder="e.g. Harrison Township"></div>
+    <div class="row-2">
+      <div class="field"><label>Owner / Manager Name</label><input id="f-owner" placeholder="Full name"></div>
+      <div class="field"><label>Store Phone</label><input id="f-phone" placeholder="(586) 555-0100"></div>
+    </div>
+    <div class="field"><label>Store Address</label><input id="f-address" placeholder="Street, city, state, zip"></div>
+    <div class="field"><label>Email</label><input id="f-email" type="email" placeholder="you@example.com"></div>
+    <div class="row-2">
+      <div class="field"><label>Password</label><input id="f-pass" type="password" placeholder="Min. 8 characters"></div>
+      <div class="field"><label>Confirm Password</label><input id="f-pass2" type="password" placeholder="Re-enter password"></div>
+    </div>
+    <div class="err" id="form-err"></div>
+
+    <button class="signup-btn" onclick="submitSignup()">Create My Store Account</button>
+    <div class="login-link">Already have an account? <a href="dashboard.html">Log in</a></div>
+  </div>
+
+  <div id="success-screen">
+    <div class="logo">Buscemi's</div>
+    <h2 style="margin-top:14px;">You're all set!</h2>
+    <div class="success-note">Your unique Store ID has been generated automatically:</div>
+    <div class="store-id-display" id="generated-id"></div>
+    <div class="success-note">Save this — it's how you'll log in to your dashboard from now on.</div>
+    <button class="go-btn" onclick="goToDashboard()">Go to My Dashboard →</button>
+  </div>
+
+</div>
+
+<script>
+function generateStoreId(locationName){
+  const clean = (locationName || 'STORE').trim().toUpperCase().replace(/[^A-Z]/g, '').slice(0, 10) || 'STORE';
+  const suffix = Math.floor(1000 + Math.random() * 9000);
+  return clean + '-' + suffix;
+}
+
+function submitSignup(){
+  const location = document.getElementById('f-location').value.trim();
+  const owner = document.getElementById('f-owner').value.trim();
+  const phone = document.getElementById('f-phone').value.trim();
+  const address = document.getElementById('f-address').value.trim();
+  const email = document.getElementById('f-email').value.trim();
+  const pass = document.getElementById('f-pass').value;
+  const pass2 = document.getElementById('f-pass2').value;
+  const err = document.getElementById('form-err');
+
+  if(!location || !owner || !phone || !address || !email || !pass){
+    err.textContent = 'Please fill in every field.';
+    err.style.display = 'block';
+    return;
+  }
+  if(pass.length < 8){
+    err.textContent = 'Password must be at least 8 characters.';
+    err.style.display = 'block';
+    return;
+  }
+  if(pass !== pass2){
+    err.textContent = 'Passwords do not match.';
+    err.style.display = 'block';
+    return;
+  }
+  err.style.display = 'none';
+
+  const storeId = generateStoreId(location);
+
+  // Demo only: in a real system this account would be created server-side,
+  // the password hashed, and the Store ID persisted in the database.
+  document.getElementById('generated-id').textContent = storeId;
+  document.getElementById('form-screen').style.display = 'none';
+  document.getElementById('success-screen').style.display = 'block';
+  window.__newStoreId = storeId;
+}
+
+function goToDashboard(){
+  window.location.href = 'dashboard.html?store=' + encodeURIComponent(window.__newStoreId || '');
+}
+</script>
+
+</body>
+</html>
