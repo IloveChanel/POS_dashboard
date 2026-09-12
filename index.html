@@ -3,243 +3,92 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Buscemi's — Store Dashboard</title>
+<title>Buscemi's — Store Login</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Fredoka:wght@500;600;700&family=Nunito+Sans:wght@400;600;700;800&family=Yellowtail&display=swap" rel="stylesheet">
 <style>
   :root{
     --red:#C8102E; --red-deep:#970B22;
     --cream:#FFF8EC; --wood:#5C3A22; --wood-dark:#432A18;
-    --gold:#F4B942; --ink:#2B1B10;
-    --green:#3B7A3B; --green-bg:#E7F3E7;
-    --amber:#B5790F; --amber-bg:#FDF1DA;
-    --gray:#8A7460; --gray-bg:#F1ECE3;
-    --line: rgba(43,27,16,0.14);
+    --gold:#F4B942; --ink:#2B1B10; --gray:#8A7460; --line: rgba(43,27,16,0.14);
   }
   *{box-sizing:border-box;}
-  body{margin:0;background:#F6F1E9;color:var(--ink);font-family:'Nunito Sans',sans-serif;}
+  body{margin:0;min-height:100vh;background:linear-gradient(135deg,var(--wood) 0%,var(--wood-dark) 100%);
+    font-family:'Nunito Sans',sans-serif;color:var(--ink);display:flex;align-items:center;justify-content:center;padding:30px;}
   h1,h2,h3{font-family:'Fredoka',sans-serif;font-weight:700;margin:0;}
   button{font-family:inherit;cursor:pointer;border:none;}
 
-  /* ---------- Login ---------- */
-  #login-screen{
-    min-height:100vh;display:flex;align-items:center;justify-content:center;
-    background:linear-gradient(135deg,var(--wood) 0%,var(--wood-dark) 100%);
-  }
-  .login-card{
-    background:var(--cream);border-radius:14px;padding:40px 36px;width:100%;max-width:380px;
-    box-shadow:0 20px 50px rgba(0,0,0,0.35);
-  }
+  .login-card{background:var(--cream);border-radius:14px;padding:40px 36px;width:100%;max-width:380px;box-shadow:0 20px 50px rgba(0,0,0,0.35);}
   .login-logo{font-family:'Yellowtail',cursive;font-size:38px;color:var(--red);text-align:center;margin-bottom:2px;}
-  .login-sub{text-align:center;font-size:12px;font-weight:800;letter-spacing:0.1em;color:var(--gray);margin-bottom:28px;}
-  .field{margin-bottom:16px;}
-  .field label{display:block;font-size:13px;font-weight:700;margin-bottom:6px;color:#5A4534;}
-  .field input{
-    width:100%;padding:12px 14px;border:2px solid var(--line);border-radius:8px;font-size:15px;
-    background:#fff;color:var(--ink);
-  }
-  .field input:focus{outline:none;border-color:var(--red);}
-  .login-btn{
-    width:100%;background:var(--red);color:#fff;font-weight:800;font-size:16px;
-    padding:14px;border-radius:8px;margin-top:10px;box-shadow:0 4px 0 var(--red-deep);
-  }
-  .login-btn:hover{background:var(--red-deep);}
-  .login-hint{font-size:12px;color:var(--gray);text-align:center;margin-top:16px;}
-  .login-error{font-size:13px;color:var(--red);text-align:center;margin-top:10px;display:none;}
   .auth-tabs{display:flex;gap:4px;background:#EFE7D8;border-radius:8px;padding:4px;margin:18px 0 22px;}
   .auth-tab{flex:1;padding:9px;border-radius:6px;font-weight:700;font-size:13.5px;background:transparent;color:var(--gray);}
   .auth-tab.active{background:#fff;color:var(--red);box-shadow:0 2px 4px rgba(0,0,0,0.08);}
+
+  .field{margin-bottom:16px;}
+  .field label{display:block;font-size:13px;font-weight:700;margin-bottom:6px;color:#5A4534;}
+  .field input{width:100%;padding:12px 14px;border:2px solid var(--line);border-radius:8px;font-size:15px;background:#fff;color:var(--ink);}
+  .field input:focus{outline:none;border-color:var(--red);}
   .field-row{display:grid;grid-template-columns:1fr 1fr;gap:12px;}
 
-  /* ---------- Dashboard ---------- */
-  #dashboard{display:none;}
-  header.dash-header{
-    background:var(--ink);color:var(--cream);padding:16px 0;position:sticky;top:0;z-index:10;
-  }
-  .dash-wrap{max-width:1100px;margin:0 auto;padding:0 24px;}
-  .dash-top{display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:12px;}
-  .store-id{font-family:'Fredoka',sans-serif;font-weight:700;font-size:19px;}
-  .store-id small{display:block;font-family:'Nunito Sans',sans-serif;font-weight:600;font-size:12px;color:rgba(255,248,236,0.6);}
-  .status-live{display:flex;align-items:center;gap:8px;font-size:13px;font-weight:700;}
-  .dot{width:9px;height:9px;border-radius:50%;background:#4CD964;box-shadow:0 0 0 3px rgba(76,217,100,0.25);}
-  .logout-btn{background:transparent;color:var(--cream);border:1.5px solid rgba(255,248,236,0.4)!important;padding:8px 16px;border-radius:8px;font-size:13px;font-weight:700;}
-  .logout-btn:hover{background:rgba(255,248,236,0.1);}
-
-  .summary-row{display:flex;gap:12px;padding:20px 0 4px;flex-wrap:wrap;}
-  .summary-pill{
-    background:#fff;border:1px solid var(--line);border-radius:10px;padding:12px 20px;
-    display:flex;flex-direction:column;gap:2px;cursor:pointer;min-width:110px;
-  }
-  .summary-pill.active{border-color:var(--red);box-shadow:0 0 0 2px rgba(200,16,46,0.15);}
-  .summary-pill .num{font-family:'Fredoka',sans-serif;font-weight:700;font-size:24px;}
-  .summary-pill .lbl{font-size:12px;color:#6b5748;font-weight:700;}
-
-  .orders-list{max-width:1100px;margin:0 auto;padding:16px 24px 60px;display:flex;flex-direction:column;gap:14px;}
-  .order-card{
-    background:#fff;border:1px solid var(--line);border-radius:12px;padding:20px 22px;
-    display:flex;justify-content:space-between;gap:20px;flex-wrap:wrap;
-  }
-  .order-left{flex:1;min-width:220px;}
-  .order-head{display:flex;align-items:center;gap:10px;margin-bottom:6px;flex-wrap:wrap;}
-  .order-num{font-family:'Fredoka',sans-serif;font-weight:700;font-size:18px;}
-  .fulfill-badge{
-    font-size:11px;font-weight:800;text-transform:uppercase;letter-spacing:0.04em;
-    padding:3px 10px;border-radius:100px;background:var(--gray-bg);color:var(--gray);
-  }
-  .fulfill-badge.delivery{background:#EAE5F7;color:#5B4B9E;}
-  .order-time{font-size:12.5px;color:#8A7460;}
-  .order-customer{font-size:14.5px;font-weight:700;margin:8px 0 4px;}
-  .order-items{font-size:13.5px;color:#5A4534;line-height:1.6;}
-  .order-total{font-family:'Fredoka',sans-serif;font-weight:700;font-size:15px;margin-top:8px;color:var(--red);}
-
-  .order-right{display:flex;flex-direction:column;align-items:flex-end;gap:10px;min-width:160px;}
-  .status-badge{
-    font-size:12px;font-weight:800;padding:6px 14px;border-radius:100px;text-transform:uppercase;letter-spacing:0.03em;
-  }
-  .status-badge.open{background:var(--amber-bg);color:var(--amber);}
-  .status-badge.printed{background:#E4EEFB;color:#2C5FA8;}
-  .status-badge.fulfilled{background:var(--green-bg);color:var(--green);}
-  .order-actions{display:flex;gap:8px;flex-wrap:wrap;justify-content:flex-end;}
-  .action-btn{
-    font-size:12.5px;font-weight:700;padding:8px 14px;border-radius:7px;white-space:nowrap;
-  }
-  .action-btn.print{background:var(--ink);color:var(--cream);}
-  .action-btn.print:hover{background:#3d2716;}
-  .action-btn.fulfill{background:var(--green);color:#fff;}
-  .action-btn.fulfill:hover{background:#2f632f;}
-  .action-btn.reopen{background:transparent;border:1.5px solid var(--line)!important;color:#6b5748;}
-  .action-btn.reopen:hover{background:#F1ECE3;}
-
-  .empty-state{text-align:center;padding:60px 20px;color:#8A7460;font-size:14px;}
-
-  /* ---------- Print ticket (thermal-receipt formatted) ---------- */
-  #print-ticket{display:none;}
-  @media print{
-    body *{visibility:hidden;}
-    #print-ticket, #print-ticket *{visibility:visible;}
-    #print-ticket{
-      display:block;position:absolute;top:0;left:0;width:80mm;padding:6mm;
-      font-family:'Courier New',monospace;color:#000;background:#fff;
-    }
-    @page{size:80mm auto;margin:0;}
-  }
-  #print-ticket .t-center{text-align:center;}
-  #print-ticket .t-line{border-top:1px dashed #000;margin:6px 0;}
-  #print-ticket .t-row{display:flex;justify-content:space-between;font-size:13px;margin:3px 0;}
-  #print-ticket .t-big{font-size:18px;font-weight:bold;}
-  #print-ticket .t-mod{font-size:11px;padding-left:10px;}
-
-  /* ---------- Shared admin nav ---------- */
-  .admin-nav{background:var(--wood-dark);padding:0;}
-  .admin-nav .dash-wrap{display:flex;gap:4px;}
-  .admin-nav a{
-    color:rgba(255,248,236,0.65);font-size:13.5px;font-weight:700;
-    padding:14px 18px;display:inline-block;border-bottom:3px solid transparent;
-  }
-  .admin-nav a.active{color:var(--cream);border-bottom-color:var(--gold);}
-  .admin-nav a:hover{color:var(--cream);}
-
-  /* ---------- Order detail additions ---------- */
-  .item-line{display:flex;justify-content:space-between;gap:10px;}
-  .item-mods{font-size:12px;color:#8A7460;padding-left:14px;font-style:italic;}
-  .contact-block{
-    margin-top:10px;padding-top:10px;border-top:1px dashed var(--line);
-    font-size:12.5px;color:#6b5748;display:flex;flex-direction:column;gap:3px;
-  }
-  .contact-block .marketing-tag{
-    display:inline-block;margin-top:4px;font-size:11px;font-weight:800;color:var(--green);
-    background:var(--green-bg);padding:2px 8px;border-radius:100px;width:fit-content;
-  }
-
-  @media (max-width:600px){
-    .order-card{flex-direction:column;}
-    .order-right{align-items:flex-start;width:100%;}
-    .order-actions{justify-content:flex-start;}
-  }
+  .login-btn{width:100%;background:var(--red);color:#fff;font-weight:800;font-size:16px;padding:14px;border-radius:8px;margin-top:10px;box-shadow:0 4px 0 var(--red-deep);}
+  .login-btn:hover{background:var(--red-deep);}
+  .login-hint{font-size:12px;color:var(--gray);text-align:center;margin-top:16px;}
+  .login-error{font-size:13px;color:var(--red);text-align:center;margin-top:10px;display:none;}
 </style>
 </head>
 <body>
 
-<div id="login-screen">
-  <div class="login-card">
-    <div class="login-logo">Buscemi's</div>
-    <div class="auth-tabs">
-      <button class="auth-tab active" id="tab-login" onclick="showAuthView('login')">Log In</button>
-      <button class="auth-tab" id="tab-signup" onclick="showAuthView('signup')">Sign Up</button>
-    </div>
-
-    <div id="login-view">
-      <div class="field">
-        <label>Store ID</label>
-        <input type="text" id="store-id-input" value="HARRISON-001" autocomplete="off">
-      </div>
-      <div class="field">
-        <label>PIN</label>
-        <input type="password" id="pin-input" value="1234" autocomplete="off">
-      </div>
-      <button class="login-btn" onclick="login()">Log In</button>
-      <div class="login-error" id="login-error">Store ID or PIN not recognized.</div>
-      <div class="login-hint">Demo: any Store ID works with PIN 1234</div>
-    </div>
-
-    <div id="signup-view" style="display:none;">
-      <div class="field"><label>Store Location Name</label><input id="f-location" placeholder="e.g. Harrison Township"></div>
-      <div class="field-row">
-        <div class="field"><label>Owner / Manager Name</label><input id="f-owner" placeholder="Full name"></div>
-        <div class="field"><label>Store Phone</label><input id="f-phone" placeholder="(586) 555-0100"></div>
-      </div>
-      <div class="field"><label>Store Address</label><input id="f-address" placeholder="Street, city, state, zip"></div>
-      <div class="field"><label>Email</label><input id="f-email" type="email" placeholder="you@example.com"></div>
-      <div class="field-row">
-        <div class="field"><label>Password</label><input id="f-pass" type="password" placeholder="Min. 8 characters"></div>
-        <div class="field"><label>Confirm Password</label><input id="f-pass2" type="password" placeholder="Re-enter password"></div>
-      </div>
-      <div class="login-error" id="signup-error"></div>
-      <button class="login-btn" onclick="submitSignup()">Create My Store Account</button>
-      <div class="login-hint">Creating an account logs you straight into your new dashboard.</div>
-    </div>
-
-  </div>
-</div>
-
-<div id="dashboard">
-  <header class="dash-header">
-    <div class="dash-wrap dash-top">
-      <div class="store-id" id="store-id-display">Harrison Township<small>Store ID: HARRISON-001</small></div>
-      <div class="status-live"><span class="dot"></span> Live</div>
-      <button class="logout-btn" onclick="logout()">Log Out</button>
-    </div>
-  </header>
-  <nav class="admin-nav">
-    <div class="dash-wrap">
-      <a href="index.html" class="active">Orders</a>
-      <a href="menu-items.html">Menu Items</a>
-      <a href="export.html">Export / Accounting</a>
-    </div>
-  </nav>
-
-  <div class="dash-wrap">
-    <div class="summary-row" id="summary-row"></div>
+<div class="login-card">
+  <div class="login-logo">Buscemi's</div>
+  <div class="auth-tabs">
+    <button class="auth-tab active" id="tab-login" onclick="showAuthView('login')">Log In</button>
+    <button class="auth-tab" id="tab-signup" onclick="showAuthView('signup')">Sign Up</button>
   </div>
 
-  <div class="orders-list" id="orders-list"></div>
-</div>
+  <div id="login-view">
+    <div class="field"><label>Store ID</label><input type="text" id="store-id-input" value="HARRISON-001" autocomplete="off"></div>
+    <div class="field"><label>PIN</label><input type="password" id="pin-input" value="1234" autocomplete="off"></div>
+    <button class="login-btn" onclick="login()">Log In</button>
+    <div class="login-error" id="login-error">Store ID or PIN not recognized.</div>
+    <div class="login-hint">Demo: any Store ID works with PIN 1234</div>
+  </div>
 
-<div id="print-ticket"></div>
+  <div id="signup-view" style="display:none;">
+    <div class="field"><label>Store Location Name</label><input id="f-location" placeholder="e.g. Harrison Township"></div>
+    <div class="field-row">
+      <div class="field"><label>Owner / Manager Name</label><input id="f-owner" placeholder="Full name"></div>
+      <div class="field"><label>Store Phone</label><input id="f-phone" placeholder="(586) 555-0100"></div>
+    </div>
+    <div class="field"><label>Store Address</label><input id="f-address" placeholder="Street, city, state, zip"></div>
+    <div class="field"><label>Email</label><input id="f-email" type="email" placeholder="you@example.com"></div>
+    <div class="field-row">
+      <div class="field"><label>Password</label><input id="f-pass" type="password" placeholder="Min. 8 characters"></div>
+      <div class="field"><label>Confirm Password</label><input id="f-pass2" type="password" placeholder="Re-enter password"></div>
+    </div>
+    <div class="login-error" id="signup-error"></div>
+    <button class="login-btn" onclick="submitSignup()">Create My Store Account</button>
+    <div class="login-hint">Creating an account takes you straight to your new dashboard.</div>
+  </div>
+</div>
 
 <script>
-// If arriving with a store ID in the URL (legacy link), pre-fill it
-const urlParams = new URLSearchParams(window.location.search);
-const incomingStoreId = urlParams.get('store');
-if(incomingStoreId){
-  document.getElementById('store-id-input').value = incomingStoreId;
-}
-
 function showAuthView(view){
   document.getElementById('tab-login').classList.toggle('active', view==='login');
   document.getElementById('tab-signup').classList.toggle('active', view==='signup');
   document.getElementById('login-view').style.display = view==='login' ? 'block' : 'none';
   document.getElementById('signup-view').style.display = view==='signup' ? 'block' : 'none';
+}
+
+function login(){
+  const storeId = document.getElementById('store-id-input').value.trim();
+  const pin = document.getElementById('pin-input').value.trim();
+  const err = document.getElementById('login-error');
+  if(!storeId || pin !== '1234'){
+    err.style.display = 'block';
+    return;
+  }
+  err.style.display = 'none';
+  window.location.href = 'orders.html?store=Harrison%20Township&id=' + encodeURIComponent(storeId.toUpperCase());
 }
 
 function generateStoreId(locationName){
@@ -276,170 +125,7 @@ function submitSignup(){
   err.style.display = 'none';
 
   const storeId = generateStoreId(location);
-  document.getElementById('store-id-display').innerHTML =
-    location + '<small>Store ID: ' + storeId + '</small>';
-  document.getElementById('login-screen').style.display = 'none';
-  document.getElementById('dashboard').style.display = 'block';
-  render();
-}
-
-let orders = [
-  {id:'1042', time:'6:14 PM', customer:'Michelle Vance', phone:'(586) 555-0142', address:null, email:'mvance@email.com', subscribed:true, fulfill:'pickup',
-    items:[
-      {name:'2x Detroit Style Pizza', mods:['Extra cheese','Extra sauce','Light on the pepperoni']},
-      {name:'1x Chicken Tenders 5pc', mods:['Ranch on the side']}
-    ], total:'$58.97', status:'open'},
-  {id:'1043', time:'6:09 PM', customer:'James Kowalski', phone:'(586) 555-0198', address:'214 Jefferson Cir, Harrison Twp', email:'jkowalski@email.com', subscribed:false, fulfill:'delivery',
-    items:[
-      {name:'1x The Torpedo 12"', mods:['No banana peppers']},
-      {name:'1x Square Cheese Tray 6pc', mods:[]}
-    ], total:'$26.98', status:'printed'},
-  {id:'1044', time:'6:02 PM', customer:'Angela Reyes', phone:'(586) 555-0173', address:null, email:null, subscribed:false, fulfill:'pickup',
-    items:[
-      {name:'1x Detroit Style Pizza', mods:['Extra sauce']},
-      {name:'2x Mozzarella Sticks', mods:[]}
-    ], total:'$35.97', status:'fulfilled'},
-  {id:'1045', time:'5:58 PM', customer:'Tom Bishara', phone:'(586) 555-0121', address:'88 Crocker Blvd, Harrison Twp', email:'tbishara@email.com', subscribed:true, fulfill:'delivery',
-    items:[
-      {name:'3x Detroit Style Pizza', mods:['1 plain cheese, 2 extra cheese + extra sauce']}
-    ], total:'$74.97', status:'open'},
-  {id:'1046', time:'5:51 PM', customer:'Priya Nair', phone:'(586) 555-0165', address:null, email:'priyan@email.com', subscribed:true, fulfill:'pickup',
-    items:[
-      {name:'1x The Torpedo 12"', mods:['Extra oregano salt']},
-      {name:'1x Chicken Wings 5pc', mods:['Buffalo sauce']}
-    ], total:'$20.98', status:'fulfilled'},
-  {id:'1047', time:'5:47 PM', customer:'Dave Okafor', phone:'(586) 555-0187', address:null, email:null, subscribed:false, fulfill:'pickup',
-    items:[
-      {name:'2x Square Cheese Tray 6pc', mods:['Extra cheese on one tray']}
-    ], total:'$29.98', status:'printed'}
-];
-
-let activeFilter = 'all';
-
-function login(){
-  const storeId = document.getElementById('store-id-input').value.trim();
-  const pin = document.getElementById('pin-input').value.trim();
-  const err = document.getElementById('login-error');
-  if(!storeId || pin !== '1234'){
-    err.style.display = 'block';
-    return;
-  }
-  err.style.display = 'none';
-  document.getElementById('store-id-display').innerHTML =
-    'Harrison Township<small>Store ID: ' + storeId.toUpperCase() + '</small>';
-  document.getElementById('login-screen').style.display = 'none';
-  document.getElementById('dashboard').style.display = 'block';
-  render();
-}
-
-function logout(){
-  document.getElementById('dashboard').style.display = 'none';
-  document.getElementById('login-screen').style.display = 'flex';
-}
-
-function setStatus(id, status){
-  orders = orders.map(o => o.id === id ? {...o, status} : o);
-  render();
-}
-
-function printTicket(id){
-  const o = orders.find(o => o.id === id);
-  if(!o) return;
-  const ticket = document.getElementById('print-ticket');
-  ticket.innerHTML = `
-    <div class="t-center t-big">BUSCEMI'S</div>
-    <div class="t-center">Harrison Township</div>
-    <div class="t-center">586-468-4779</div>
-    <div class="t-line"></div>
-    <div class="t-row"><span>ORDER #${o.id}</span><span>${o.time}</span></div>
-    <div class="t-row"><span>${o.fulfill.toUpperCase()}</span><span></span></div>
-    <div class="t-line"></div>
-    <div>${o.customer}</div>
-    ${o.phone ? `<div>${o.phone}</div>` : ''}
-    ${o.address ? `<div>${o.address}</div>` : ''}
-    <div class="t-line"></div>
-    ${o.items.map(it => `
-      <div>${it.name}</div>
-      ${it.mods.map(m => `<div class="t-mod">- ${m}</div>`).join('')}
-    `).join('')}
-    <div class="t-line"></div>
-    <div class="t-row t-big"><span>TOTAL</span><span>${o.total}</span></div>
-    <div class="t-line"></div>
-    <div class="t-center">Thank you!</div>
-  `;
-  window.print();
-  setStatus(id, 'printed');
-}
-
-function setFilter(f){
-  activeFilter = f;
-  render();
-}
-
-function render(){
-  const counts = {
-    all: orders.length,
-    open: orders.filter(o=>o.status==='open').length,
-    printed: orders.filter(o=>o.status==='printed').length,
-    fulfilled: orders.filter(o=>o.status==='fulfilled').length
-  };
-  const summary = document.getElementById('summary-row');
-  summary.innerHTML = ['all','open','printed','fulfilled'].map(f => `
-    <div class="summary-pill ${activeFilter===f?'active':''}" onclick="setFilter('${f}')">
-      <span class="num">${counts[f]}</span>
-      <span class="lbl">${f.charAt(0).toUpperCase()+f.slice(1)}</span>
-    </div>
-  `).join('');
-
-  const list = document.getElementById('orders-list');
-  const shown = activeFilter === 'all' ? orders : orders.filter(o => o.status === activeFilter);
-
-  if(shown.length === 0){
-    list.innerHTML = '<div class="empty-state">No orders in this view.</div>';
-    return;
-  }
-
-  list.innerHTML = shown.map(o => `
-    <div class="order-card">
-      <div class="order-left">
-        <div class="order-head">
-          <span class="order-num">#${o.id}</span>
-          <span class="fulfill-badge ${o.fulfill}">${o.fulfill}</span>
-          <span class="order-time">${o.time}</span>
-        </div>
-        <div class="order-customer">${o.customer}</div>
-        <div class="order-items">
-          ${o.items.map(it => `
-            <div class="item-line">${it.name}</div>
-            ${it.mods.map(m => `<div class="item-mods">— ${m}</div>`).join('')}
-          `).join('')}
-        </div>
-        <div class="order-total">${o.total}</div>
-        <div class="contact-block">
-          <span>${o.phone}</span>
-          ${o.address ? `<span>${o.address}</span>` : ''}
-          ${o.email ? `<span>${o.email}</span>` : ''}
-          ${o.subscribed ? `<span class="marketing-tag">Opted in — coupon list</span>` : ''}
-        </div>
-      </div>
-      <div class="order-right">
-        <span class="status-badge ${o.status}">${o.status}</span>
-        <div class="order-actions">
-          ${o.status === 'open' ? `
-            <button class="action-btn print" onclick="printTicket('${o.id}')">Print Ticket</button>
-            <button class="action-btn fulfill" onclick="setStatus('${o.id}','fulfilled')">Mark Fulfilled</button>
-          ` : ''}
-          ${o.status === 'printed' ? `
-            <button class="action-btn fulfill" onclick="setStatus('${o.id}','fulfilled')">Mark Fulfilled</button>
-            <button class="action-btn reopen" onclick="setStatus('${o.id}','open')">Reopen</button>
-          ` : ''}
-          ${o.status === 'fulfilled' ? `
-            <button class="action-btn reopen" onclick="setStatus('${o.id}','open')">Reopen</button>
-          ` : ''}
-        </div>
-      </div>
-    </div>
-  `).join('');
+  window.location.href = 'orders.html?store=' + encodeURIComponent(location) + '&id=' + encodeURIComponent(storeId);
 }
 </script>
 
