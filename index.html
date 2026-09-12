@@ -46,6 +46,10 @@
   .login-btn:hover{background:var(--red-deep);}
   .login-hint{font-size:12px;color:var(--gray);text-align:center;margin-top:16px;}
   .login-error{font-size:13px;color:var(--red);text-align:center;margin-top:10px;display:none;}
+  .auth-tabs{display:flex;gap:4px;background:#EFE7D8;border-radius:8px;padding:4px;margin:18px 0 22px;}
+  .auth-tab{flex:1;padding:9px;border-radius:6px;font-weight:700;font-size:13.5px;background:transparent;color:var(--gray);}
+  .auth-tab.active{background:#fff;color:var(--red);box-shadow:0 2px 4px rgba(0,0,0,0.08);}
+  .field-row{display:grid;grid-template-columns:1fr 1fr;gap:12px;}
 
   /* ---------- Dashboard ---------- */
   #dashboard{display:none;}
@@ -159,19 +163,42 @@
 <div id="login-screen">
   <div class="login-card">
     <div class="login-logo">Buscemi's</div>
-    <div class="login-sub">STORE DASHBOARD LOGIN</div>
-    <div class="field">
-      <label>Store ID</label>
-      <input type="text" id="store-id-input" value="HARRISON-001" autocomplete="off">
+    <div class="auth-tabs">
+      <button class="auth-tab active" id="tab-login" onclick="showAuthView('login')">Log In</button>
+      <button class="auth-tab" id="tab-signup" onclick="showAuthView('signup')">Sign Up</button>
     </div>
-    <div class="field">
-      <label>PIN</label>
-      <input type="password" id="pin-input" value="1234" autocomplete="off">
+
+    <div id="login-view">
+      <div class="field">
+        <label>Store ID</label>
+        <input type="text" id="store-id-input" value="HARRISON-001" autocomplete="off">
+      </div>
+      <div class="field">
+        <label>PIN</label>
+        <input type="password" id="pin-input" value="1234" autocomplete="off">
+      </div>
+      <button class="login-btn" onclick="login()">Log In</button>
+      <div class="login-error" id="login-error">Store ID or PIN not recognized.</div>
+      <div class="login-hint">Demo: any Store ID works with PIN 1234</div>
     </div>
-    <button class="login-btn" onclick="login()">Log In</button>
-    <div class="login-error" id="login-error">Store ID or PIN not recognized.</div>
-    <div class="login-hint">Demo: any Store ID works with PIN 1234</div>
-    <div class="login-hint">New store? <a href="signup.html" style="color:var(--red);font-weight:700;">Create an account</a></div>
+
+    <div id="signup-view" style="display:none;">
+      <div class="field"><label>Store Location Name</label><input id="f-location" placeholder="e.g. Harrison Township"></div>
+      <div class="field-row">
+        <div class="field"><label>Owner / Manager Name</label><input id="f-owner" placeholder="Full name"></div>
+        <div class="field"><label>Store Phone</label><input id="f-phone" placeholder="(586) 555-0100"></div>
+      </div>
+      <div class="field"><label>Store Address</label><input id="f-address" placeholder="Street, city, state, zip"></div>
+      <div class="field"><label>Email</label><input id="f-email" type="email" placeholder="you@example.com"></div>
+      <div class="field-row">
+        <div class="field"><label>Password</label><input id="f-pass" type="password" placeholder="Min. 8 characters"></div>
+        <div class="field"><label>Confirm Password</label><input id="f-pass2" type="password" placeholder="Re-enter password"></div>
+      </div>
+      <div class="login-error" id="signup-error"></div>
+      <button class="login-btn" onclick="submitSignup()">Create My Store Account</button>
+      <div class="login-hint">Creating an account logs you straight into your new dashboard.</div>
+    </div>
+
   </div>
 </div>
 
@@ -185,7 +212,7 @@
   </header>
   <nav class="admin-nav">
     <div class="dash-wrap">
-      <a href="dashboard.html" class="active">Orders</a>
+      <a href="index.html" class="active">Orders</a>
       <a href="menu-items.html">Menu Items</a>
       <a href="export.html">Export / Accounting</a>
     </div>
@@ -201,11 +228,59 @@
 <div id="print-ticket"></div>
 
 <script>
-// Pre-fill Store ID if arriving from the signup page
+// If arriving with a store ID in the URL (legacy link), pre-fill it
 const urlParams = new URLSearchParams(window.location.search);
 const incomingStoreId = urlParams.get('store');
 if(incomingStoreId){
   document.getElementById('store-id-input').value = incomingStoreId;
+}
+
+function showAuthView(view){
+  document.getElementById('tab-login').classList.toggle('active', view==='login');
+  document.getElementById('tab-signup').classList.toggle('active', view==='signup');
+  document.getElementById('login-view').style.display = view==='login' ? 'block' : 'none';
+  document.getElementById('signup-view').style.display = view==='signup' ? 'block' : 'none';
+}
+
+function generateStoreId(locationName){
+  const clean = (locationName || 'STORE').trim().toUpperCase().replace(/[^A-Z]/g, '').slice(0, 10) || 'STORE';
+  const suffix = Math.floor(1000 + Math.random() * 9000);
+  return clean + '-' + suffix;
+}
+
+function submitSignup(){
+  const location = document.getElementById('f-location').value.trim();
+  const owner = document.getElementById('f-owner').value.trim();
+  const phone = document.getElementById('f-phone').value.trim();
+  const address = document.getElementById('f-address').value.trim();
+  const email = document.getElementById('f-email').value.trim();
+  const pass = document.getElementById('f-pass').value;
+  const pass2 = document.getElementById('f-pass2').value;
+  const err = document.getElementById('signup-error');
+
+  if(!location || !owner || !phone || !address || !email || !pass){
+    err.textContent = 'Please fill in every field.';
+    err.style.display = 'block';
+    return;
+  }
+  if(pass.length < 8){
+    err.textContent = 'Password must be at least 8 characters.';
+    err.style.display = 'block';
+    return;
+  }
+  if(pass !== pass2){
+    err.textContent = 'Passwords do not match.';
+    err.style.display = 'block';
+    return;
+  }
+  err.style.display = 'none';
+
+  const storeId = generateStoreId(location);
+  document.getElementById('store-id-display').innerHTML =
+    location + '<small>Store ID: ' + storeId + '</small>';
+  document.getElementById('login-screen').style.display = 'none';
+  document.getElementById('dashboard').style.display = 'block';
+  render();
 }
 
 let orders = [
